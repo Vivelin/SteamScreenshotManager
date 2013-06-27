@@ -17,7 +17,8 @@ namespace SSM
       Application.EnableVisualStyles();
       Application.SetCompatibleTextRenderingDefault(false);
 
-      string dota2 = Steam.GetAppName(570);
+      Manager m = new Manager(@"C:\Users\r.verdoes\Dropbox\Public\Games");
+      m.Move();
 
       Application.Run();
     }

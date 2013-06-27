@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace SSM
 {
+  /// <summary>
+  /// Provides static functions relating to Steam.
+  /// </summary>
   class Steam
   {
     private const int WEBCONTENT_MAX_LENGTH = 4096;
@@ -15,6 +18,9 @@ namespace SSM
     private static Dictionary<int, string> appNames;
     private static string appBaseUrl = "http://steamcommunity.com/app/{0}";
 
+    /// <summary>
+    /// Initializes static fields and properties.
+    /// </summary>
     static Steam()
     {
       Steam.appNames = new Dictionary<int, string>();
@@ -34,15 +40,23 @@ namespace SSM
       else
       {
         WebClient client = new WebClient();
+
+        int ticks = Environment.TickCount;
         string content = client.DownloadString(string.Format(appBaseUrl, id));
+        Console.WriteLine("Request for {0} completed in {1} ms", id, (Environment.TickCount - ticks));
+
         if (content != null)
         {
           if (content.Length > WEBCONTENT_MAX_LENGTH) content = content.Substring(0, WEBCONTENT_MAX_LENGTH);
 
-          Match m = Regex.Match(content, "<title>(.* :: )?(.*)</title>", RegexOptions.IgnoreCase);
+          Match m = Regex.Match(content, "<title>(.*) :: ?(.*)</title>", RegexOptions.IgnoreCase);
           if (m.Groups.Count > 2)
           {
             string name = m.Groups[2].Value.Trim();
+
+            byte[] data = Encoding.Default.GetBytes(name);
+            name = Encoding.UTF8.GetString(data);
+
             Steam.appNames.Add(id, name);
             return name;
           }
