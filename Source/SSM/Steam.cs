@@ -6,61 +6,110 @@ using System.Text.RegularExpressions;
 
 namespace SSM
 {
-  /// <summary>
-  /// Provides static functions relating to Steam.
-  /// </summary>
-  class Steam
-  {
-    private const int WEBCONTENT_MAX_LENGTH = 4096;
-
-    private static Dictionary<int, string> appNames;
-    private static string appBaseUrl = "http://steamcommunity.com/app/{0}";
-
     /// <summary>
-    /// Initializes static fields and properties.
+    /// Provides static functions relating to Steam.
     /// </summary>
-    static Steam()
+    public class Steam
     {
-      Steam.appNames = new Dictionary<int, string>();
-    }
+        private const int WEBCONTENT_MAX_LENGTH = 4096;
 
-    /// <summary>
-    /// Gets the name of a Steam game with the specified ID.
-    /// </summary>
-    /// <param name="id">The Game ID of a Steam game.</param>
-    /// <returns>A string containing the display name of the game with the ID, or an empty string.</returns>
-    public static string GetAppName(int id)
-    {
-      if (Steam.appNames.ContainsKey(id))
-      {
-        return Steam.appNames[id];
-      }
-      else
-      {
-        WebClient client = new WebClient();
+        private static Dictionary<int, string> appNames;
+        private static string appBaseUrl = "http://steamcommunity.com/app/{0}";
 
-        int ticks = Environment.TickCount;
-        string content = client.DownloadString(string.Format(appBaseUrl, id));
-        Console.WriteLine("Request for {0} completed in {1} ms", id, (Environment.TickCount - ticks));
-
-        if (content != null)
+        /// <summary>
+        /// Initializes static fields and properties.
+        /// </summary>
+        static Steam()
         {
-          if (content.Length > WEBCONTENT_MAX_LENGTH) content = content.Substring(0, WEBCONTENT_MAX_LENGTH);
-
-          Match m = Regex.Match(content, "<title>(.*) :: ?(.*)</title>", RegexOptions.IgnoreCase);
-          if (m.Groups.Count > 2)
-          {
-            string name = m.Groups[2].Value.Trim();
-
-            byte[] data = Encoding.Default.GetBytes(name);
-            name = Encoding.UTF8.GetString(data);
-
-            Steam.appNames.Add(id, name);
-            return name;
-          }
+            Steam.appNames = new Dictionary<int, string>();
         }
-      }
-      return string.Empty;
+
+        /// <summary>
+        /// Gets the name of a Steam game with the specified ID.
+        /// </summary>
+        /// <param name="id">The App ID to find a name for.</param>
+        /// <returns>A string containing the display name of the game with the ID, or an empty string.</returns>
+        public static string GetAppName(int id)
+        {
+            if (Steam.appNames.ContainsKey(id))
+            {
+                return Steam.appNames[id];
+            }
+            else
+            {
+                string name = GetAppNameInternal(id);
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    Steam.appNames.Add(id, name);
+                    return name;
+                }
+            }
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Makes a web request to the Steam Community to retrieve a name, and prompts the user in case the request fails.
+        /// </summary>
+        /// <param name="id">The App ID to find a name for.</param>
+        /// <returns>A string containing the display name of the game with the ID, or an empty string.</returns>
+        private static string GetAppNameInternal(int id)
+        {
+            string name = null;
+            WebClient client = new WebClient();
+
+            int ticks = Environment.TickCount;
+            string content = client.DownloadString(string.Format(appBaseUrl, id));
+            Console.WriteLine(Properties.Resources.RequestCompletedIn, id, (Environment.TickCount - ticks));
+
+            if (content != null)
+            {
+                if (content.Length > WEBCONTENT_MAX_LENGTH) content = content.Substring(0, WEBCONTENT_MAX_LENGTH);
+                if (!TryParseAppPage(content, out name))
+                {
+                    name = PromptName(id);
+                }
+            }
+
+            return name;
+        }
+
+        /// <summary>
+        /// Prompts the user to enter a name for the specified App ID.
+        /// </summary>
+        /// <param name="id">The App ID to find a name for.</param>
+        /// <returns>The name the user entered, or null.</returns>
+        private static string PromptName(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Parses the specified content for the page title.
+        /// </summary>
+        /// <param name="content">A string containing the HTML content of the page to parse.</param>
+        /// <param name="name">The parsed name, or null.</param>
+        /// <returns>True if content was parsed successfully.</returns>
+        private static bool TryParseAppPage(string content, out string name)
+        {
+            try
+            {
+                Match m = Regex.Match(content, "<title>(.*) :: ?(.*)</title>", RegexOptions.IgnoreCase);
+                if (m.Groups.Count > 2)
+                {
+                    name = m.Groups[2].Value.Trim();
+
+                    byte[] data = Encoding.Default.GetBytes(name);
+                    name = Encoding.UTF8.GetString(data);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.WriteLine(ex);
+            }
+
+            name = null;
+            return false;
+        }
     }
-  }
 }
