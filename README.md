@@ -10,11 +10,12 @@ Current functionality
 
 - Retrieve the name of game based on it's App ID;
 - Move screenshots based on its filename into a subfolder;
+- User interface to allow naming non-Steam games.
 
 Missing functionality
 ---------------------
 
-- A user interface to show progress and to allow naming non-Steam games;
+- A user interface to show progress;
 - Cache game ID and names in a file (currently, it is only cached in memory);
 - Automatically detect the external screenshots folder from Steam's settings;
-- Continuously monitor the folder for new screenshots and move them immediately;
+- Continuously monitor the folder for new screenshots and move them immediately.
