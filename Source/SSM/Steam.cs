@@ -13,7 +13,7 @@ namespace SSM
     {
         private const int WEBCONTENT_MAX_LENGTH = 4096;
 
-        private static Dictionary<int, string> appNames;
+        private static Dictionary<ulong, string> appNames;
         private static string appBaseUrl = "http://steamcommunity.com/app/{0}";
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace SSM
         /// </summary>
         static Steam()
         {
-            Steam.appNames = new Dictionary<int, string>();
+            Steam.appNames = new Dictionary<ulong, string>();
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace SSM
         /// </summary>
         /// <param name="id">The App ID to find a name for.</param>
         /// <returns>A string containing the display name of the game with the ID, or an empty string.</returns>
-        public static string GetAppName(int id)
+        public static string GetAppName(ulong id)
         {
             if (Steam.appNames.ContainsKey(id))
             {
@@ -48,11 +48,24 @@ namespace SSM
         }
 
         /// <summary>
+        /// Associates an App ID with the specified name.
+        /// </summary>
+        /// <param name="id">The App ID.</param>
+        /// <param name="name">The name that belongs to the App ID.</param>
+        public static void SetAppName(ulong id, string name)
+        {
+            if (Steam.appNames.ContainsKey(id))
+                Steam.appNames[id] = name;
+            else
+                Steam.appNames.Add(id, name);
+        }
+
+        /// <summary>
         /// Makes a web request to the Steam Community to retrieve a name, and prompts the user in case the request fails.
         /// </summary>
         /// <param name="id">The App ID to find a name for.</param>
         /// <returns>A string containing the display name of the game with the ID, or an empty string.</returns>
-        private static string GetAppNameInternal(int id)
+        private static string GetAppNameInternal(ulong id)
         {
             string name = null;
             WebClient client = new WebClient();
@@ -66,21 +79,11 @@ namespace SSM
                 if (content.Length > WEBCONTENT_MAX_LENGTH) content = content.Substring(0, WEBCONTENT_MAX_LENGTH);
                 if (!TryParseAppPage(content, out name))
                 {
-                    name = PromptName(id);
+                    name = null;
                 }
             }
 
             return name;
-        }
-
-        /// <summary>
-        /// Prompts the user to enter a name for the specified App ID.
-        /// </summary>
-        /// <param name="id">The App ID to find a name for.</param>
-        /// <returns>The name the user entered, or null.</returns>
-        private static string PromptName(int id)
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
