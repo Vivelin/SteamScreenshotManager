@@ -132,4 +132,7 @@
   <data name="SkippedFile" xml:space="preserve">
     <value>Skipped {0}!</value>
   </data>
+  <data name="UnknownErrorFile" xml:space="preserve">
+    <value>A problem occurred while trying to move {0}: {1}</value>
+  </data>
 </root>

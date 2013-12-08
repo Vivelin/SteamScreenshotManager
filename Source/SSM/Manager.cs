@@ -52,7 +52,17 @@ namespace SSM
 
                     if (!Directory.Exists(newDir))
                         Directory.CreateDirectory(newDir);
-                    File.Move(path, newPath);
+                    try
+                    {
+                        if (!File.Exists(newPath))
+                            File.Move(path, newPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine(Properties.Resources.UnknownErrorFile, fileName, ex.Message);
+                        Console.ResetColor();
+                    }
                 }
             }
         }
