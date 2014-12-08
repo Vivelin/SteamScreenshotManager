@@ -10,60 +10,24 @@ namespace SSM
     /// Represents a configuration for the application.
     /// </summary>
     [Serializable]
-    public class Configuration
+    class Configuration
     {
-        private static string defaultFileName = null;
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="Configuration"/> class
-        /// with the default file name.
+        /// Initializes a new instance of the <see cref="Configuration"/> 
+        /// class.
         /// </summary>
-        public Configuration() : this(DefaultFileName) { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Configuration"/> class
-        /// with the specified file name.
-        /// </summary>
-        /// <param name="fileName">The name of the file.</param>
-        public Configuration(string fileName)
-        {
-            FileName = Path.GetFullPath(fileName);
-            SetDefaults();
-        }
-
-        /// <summary>
-        /// Sets properties to their default values.
-        /// </summary>
-        public void SetDefaults()
+        public Configuration()
         {
             BaseDir = null;
         }
 
         /// <summary>
-        /// Gets the name of default file that is stored in the current user's 
-        /// Application Data folder.
-        /// </summary>
-        public static string DefaultFileName
-        {
-            get
-            {
-                if (defaultFileName == null)
-                {
-                    var appDataFolder = Environment.GetFolderPath(
-                        Environment.SpecialFolder.ApplicationData);
-                    defaultFileName = Path.Combine(appDataFolder, 
-                        "SteamScreenshotManager", "Config.json");
-                }
-                return defaultFileName;
-            }
-        }
-
-        /// <summary>
-        /// Gets the full path to the file this configuration was loaded from.
+        /// Gets or sets the full path to the file this configuration 
+        /// represents.
         /// </summary>
         [Browsable(false)]
         [JsonIgnore]
-        public string FileName { get; private set; }
+        public string FileName { get; set; }
 
         /// <summary>
         /// Gets or sets the location of the screenshot folder.
@@ -75,55 +39,32 @@ namespace SSM
         /// <summary>
         /// Saves the configuration to the file it was loaded from.
         /// </summary>
-        /// <exception cref="System.Exception">Settings could not be saved. Check the inner exception for details.</exception>
         public void Save()
         {
-            try
-            {
-                string dir = Path.GetDirectoryName(this.FileName);
-                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+            string dir = Path.GetDirectoryName(this.FileName);
+            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
-                var json = JsonConvert.SerializeObject(this);
-                File.WriteAllText(FileName, json);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(string.Format(Properties.Resources.SaveSettingsFailed, FileName), ex);
-            }
+            var json = JsonConvert.SerializeObject(this);
+            File.WriteAllText(FileName, json);
         }
 
         /// <summary>
-        /// Loads the <see cref="SSM.Configuration"/> from the default file.
+        /// Creates a <see cref="Configuration"/> from the specified file.
         /// </summary>
-        /// <returns>A new instance of the <see cref="SSM.Configuration"/> class, or null.</returns>
-        /// <exception cref="System.IO.FileNotFoundException">The default file does not exist.</exception>
-        /// <exception cref="System.Exception">Settings could not be loaded. Check the inner exception for details.</exception>
-        public static Configuration Load()
+        /// <param name="path">The path to the file to load.</param>
+        /// <returns>A new <see cref="Configuration"/> class.</returns>
+        public static Configuration FromFile(string path)
         {
-            return Load(DefaultFileName);
-        }
+            var config = new Configuration();
 
-        /// <summary>
-        /// Loads the <see cref="SSM.Configuration"/> from the specified file.
-        /// </summary>
-        /// <param name="path">The name of the file to load.</param>
-        /// <returns>A new instance of the <see cref="SSM.Configuration"/> class, or null.</returns>
-        /// <exception cref="System.IO.FileNotFoundException">The file specified by <paramref name="path"/> does not exist.</exception>
-        /// <exception cref="System.Exception">Settings could not be loaded. Check the inner exception for details.</exception>
-        public static Configuration Load(string path)
-        {
-            if (!File.Exists(path)) throw new FileNotFoundException(null, path);
-
-            try
+            if (File.Exists(path))
             {
                 var json = File.ReadAllText(path);
-                var config = JsonConvert.DeserializeObject<Configuration>(json);
-                return config;
+                config = JsonConvert.DeserializeObject<Configuration>(json);
             }
-            catch (Exception ex)
-            {
-                throw new Exception(string.Format(Properties.Resources.LoadSettingsFailed, path), ex);
-            }
+
+            config.FileName = path;
+            return config;
         }
 
         /// <summary>

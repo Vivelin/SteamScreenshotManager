@@ -1,12 +1,24 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
-using CommonOpenFileDialog = Microsoft.WindowsAPICodePack.Dialogs.CommonOpenFileDialog;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace SSM
 {
     static class Program
     {
+        /// <summary>
+        /// The path to the AppData directory.
+        /// </summary>
+        public static readonly string AppData =
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+        /// <summary>
+        /// The path to the directory that contains the configuration files.
+        /// </summary>
+        public static readonly string ConfigDir =
+            Path.Combine(AppData, "SteamScreenshotManager");
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -16,12 +28,22 @@ namespace SSM
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+#if !DEBUG
             try
             {
-                Configuration config = LoadSettings();
+#endif
+                var configFile = Path.Combine(ConfigDir, "Config.json");
+                var cacheFile = Path.Combine(ConfigDir, "NameCache.json");
 
-                Manager m = new Manager(config.BaseDir);
-                m.Move();
+                var config = Configuration.FromFile(configFile);
+                CheckSettings(config);
+
+                var manager = new Manager(config.BaseDir);
+                manager.FolderNameCache = NameCache.FromFile(cacheFile);
+
+                manager.Move();
+                manager.FolderNameCache.Save();
+#if !DEBUG
             }
             catch (Exception ex)
             {
@@ -32,32 +54,20 @@ namespace SSM
                 Console.ReadKey(true);
                 return 1;
             }
+#endif
 
             Console.WriteLine("Cave Johnson, we're done here.");
             return 0;
         }
 
         /// <summary>
-        /// Loads an existing or creates a new configuration.
+        /// Checks whether the specified configuration is valid and can be 
+        /// used. If the configurationnis invalid, an appropiate exception is 
+        /// thrown. Otherwise, the function simply returns.
         /// </summary>
-        /// <returns>A <see cref="SSM.Configuration"/> object.</returns>
-        private static Configuration LoadSettings()
-        {
-            Configuration config = null;
-            if (File.Exists(Configuration.DefaultFileName))
-                config = Configuration.Load();
-            else
-                config = new Configuration();
-
-            CheckSettings(config);
-            return config;
-        }
-
-        /// <summary>
-        /// Checks whether the specified configuration is valid and can be used. If the configuration
-        /// is invalid, an appropiate exception is thrown. Otherwise, the function simply returns.
-        /// </summary>
-        /// <param name="config">The <see cref="SSM.Configuration"/> object to check.</param>
+        /// <param name="config">
+        /// The <see cref="Configuration"/> object to check.
+        /// </param>
         private static void CheckSettings(Configuration config)
         {
             if (!Directory.Exists(config.BaseDir))
@@ -83,7 +93,7 @@ namespace SSM
             {
                 dialog.IsFolderPicker = true;
                 dialog.Title = "Please select your external screenshots folder";
-                if (dialog.ShowDialog() == Microsoft.WindowsAPICodePack.Dialogs.CommonFileDialogResult.Ok)
+                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
                     return dialog.FileName;
                 }

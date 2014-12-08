@@ -10,6 +10,16 @@ namespace SSM
     class Manager
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="T:SSM.Manager"/> class with the specified base path.
+        /// </summary>
+        /// <param name="path">The path the screenshots folder.</param>
+        public Manager(string path)
+        {
+            BasePath = path;
+            IgnoredPrefixes = new List<string>();
+        }
+
+        /// <summary>
         /// The path to the screenshots folder.
         /// </summary>
         public string BasePath { get; private set; }
@@ -17,17 +27,12 @@ namespace SSM
         /// <summary>
         /// Gets a list of file name prefixes that are to be ignored.
         /// </summary>
-        public List<ulong> IgnoredPrefixes { get; private set; }
+        public List<string> IgnoredPrefixes { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:SSM.Manager"/> class with the specified base path.
+        /// Gets or sets a dictionary that maps names and IDs to folder names.
         /// </summary>
-        /// <param name="path">The path the screenshots folder.</param>
-        public Manager(string path)
-        {
-            BasePath = path;
-            IgnoredPrefixes = new List<ulong>();
-        }
+        public NameCache FolderNameCache { get; set; }
 
         /// <summary>
         /// Moves all uncategorized screenshots into their respective subfolders.
@@ -95,11 +100,21 @@ namespace SSM
             int pos = file.IndexOf('_');
             if (pos > 0)
             {
-                ulong appId = ulong.Parse(file.Substring(0, pos));
-                string name = Steam.GetAppName(appId);
+                var identifier = file.Substring(0, pos);
+                var name = FolderNameCache[identifier];
+
+                // If the identifier isn't cached, try Steam
+                if (string.IsNullOrEmpty(name))
+                {
+                    ulong appId; 
+                    if (ulong.TryParse(identifier, out appId))
+                        name = Steam.GetAppName(appId);
+                }
+
+                // If Steam doesn't know what the fuck it is, ask the user
                 if (string.IsNullOrWhiteSpace(name))
                 {
-                    name = PromptName(file, appId);
+                    name = PromptName(file, identifier);
                     if (name == null) 
                         return string.Empty;
                 }
@@ -108,6 +123,12 @@ namespace SSM
                     name = name.Replace(invalid.ToString(), "");
                 foreach (char invalid in new char[] { '™' })
                     name = name.Replace(invalid.ToString(), "");
+
+                if (!string.IsNullOrWhiteSpace(name)
+                    && !FolderNameCache.ContainsKey(identifier))
+                {
+                    FolderNameCache.Add(identifier, name);
+                }
 
                 return name;
             }
@@ -119,9 +140,9 @@ namespace SSM
         /// Prompts the user to specify a name for a file.
         /// </summary>
         /// <param name="file">The file name without path of a screenshot to show.</param>
-        /// <param name="appId">The App ID for the file.</param>
+        /// <param name="identifier">The identifier for the file.</param>
         /// <returns>A name, or null.</returns>
-        private string PromptName(string file, ulong appId)
+        private string PromptName(string file, string identifier)
         {
             string name = null;
 
@@ -130,11 +151,10 @@ namespace SSM
                 if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     name = d.GameName;
-                    Steam.SetAppName(appId, name);
                 }
                 else
                 {
-                    IgnoredPrefixes.Add(appId);
+                    IgnoredPrefixes.Add(identifier);
                 }
             }
 

@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="Configuration.cs" />
     <Compile Include="Manager.cs" />
+    <Compile Include="NameCache.cs" />
     <Compile Include="Steam.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
