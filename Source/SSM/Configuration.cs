@@ -2,8 +2,7 @@
 using System.ComponentModel;
 using System.IO;
 using System.Text;
-using System.Xml;
-using System.Xml.Serialization;
+using Newtonsoft.Json;
 
 namespace SSM
 {
@@ -13,15 +12,17 @@ namespace SSM
     [Serializable]
     public class Configuration
     {
-        private static string _defaultFileName = null;
+        private static string defaultFileName = null;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SSM.Configuration"/> class with the default file name.
+        /// Initializes a new instance of the <see cref="Configuration"/> class
+        /// with the default file name.
         /// </summary>
         public Configuration() : this(DefaultFileName) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SSM.Configuration"/> class with the specified file name.
+        /// Initializes a new instance of the <see cref="Configuration"/> class
+        /// with the specified file name.
         /// </summary>
         /// <param name="fileName">The name of the file.</param>
         public Configuration(string fileName)
@@ -39,18 +40,21 @@ namespace SSM
         }
 
         /// <summary>
-        /// Gets the name of default file that is stored in the current user's Application Data folder.
+        /// Gets the name of default file that is stored in the current user's 
+        /// Application Data folder.
         /// </summary>
         public static string DefaultFileName
         {
             get
             {
-                if (_defaultFileName == null)
+                if (defaultFileName == null)
                 {
-                    string appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                    _defaultFileName = Path.Combine(appDataFolder, "SteamScreenshotManager", "Config.xml");
+                    var appDataFolder = Environment.GetFolderPath(
+                        Environment.SpecialFolder.ApplicationData);
+                    defaultFileName = Path.Combine(appDataFolder, 
+                        "SteamScreenshotManager", "Config.json");
                 }
-                return _defaultFileName;
+                return defaultFileName;
             }
         }
 
@@ -58,7 +62,7 @@ namespace SSM
         /// Gets the full path to the file this configuration was loaded from.
         /// </summary>
         [Browsable(false)]
-        [XmlIgnore]
+        [JsonIgnore]
         public string FileName { get; private set; }
 
         /// <summary>
@@ -79,16 +83,12 @@ namespace SSM
                 string dir = Path.GetDirectoryName(this.FileName);
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
-                XmlSerializer serializer = new XmlSerializer(this.GetType());
-                using (FileStream file = new FileStream(this.FileName, FileMode.Create, FileAccess.Write, FileShare.None))
-                {
-                    XmlTextWriter writer = new XmlTextWriter(file, Encoding.UTF8) { Formatting = System.Xml.Formatting.Indented, Indentation = 1, IndentChar = '\t' };
-                    serializer.Serialize(writer, this);
-                }
+                var json = JsonConvert.SerializeObject(this);
+                File.WriteAllText(FileName, json);
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format(Properties.Resources.SaveSettingsFailed, this.FileName), ex);
+                throw new Exception(string.Format(Properties.Resources.SaveSettingsFailed, FileName), ex);
             }
         }
 
@@ -116,14 +116,9 @@ namespace SSM
 
             try
             {
-                Configuration config = new Configuration(path);
-                XmlSerializer serializer = new XmlSerializer(typeof(Configuration));
-                using (FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                {
-                    XmlTextReader reader = new XmlTextReader(file);
-                    config = (Configuration)serializer.Deserialize(reader);
-                    return config;
-                }
+                var json = File.ReadAllText(path);
+                var config = JsonConvert.DeserializeObject<Configuration>(json);
+                return config;
             }
             catch (Exception ex)
             {
