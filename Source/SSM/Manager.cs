@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace SSM
 {
@@ -9,6 +10,8 @@ namespace SSM
     /// </summary>
     class Manager
     {
+        private readonly Regex filePattern = new Regex(@"^(.+?)[\s_-]");
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:SSM.Manager"/> class with the specified base path.
         /// </summary>
@@ -97,10 +100,10 @@ namespace SSM
         /// <returns>A string with a game name or an empty string.</returns>
         private string GetNameFromFile(string file)
         {
-            int pos = file.IndexOf('_');
-            if (pos > 0)
+            var match = filePattern.Match(file);
+            if (match.Success)
             {
-                var identifier = file.Substring(0, pos);
+                var identifier = match.Result("$1");
                 var name = FolderNameCache[identifier];
 
                 // If the identifier isn't cached, try Steam
