@@ -151,6 +151,7 @@ namespace SSM
 
             using (UnknownAppIdDialog d = new UnknownAppIdDialog(Path.Combine(this.BasePath, file)))
             {
+                d.GameName = identifier;
                 if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     name = d.GameName;

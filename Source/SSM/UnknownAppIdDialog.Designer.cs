@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.BottomPanel = new System.Windows.Forms.Panel();
-            this.Cancel = new System.Windows.Forms.Button();
             this.Ok = new System.Windows.Forms.Button();
+            this.Cancel = new System.Windows.Forms.Button();
             this.Thumbnail = new System.Windows.Forms.PictureBox();
             this.MainInstructionLabel = new System.Windows.Forms.Label();
             this.DetailLabel = new System.Windows.Forms.Label();
@@ -49,19 +49,7 @@
             this.BottomPanel.Location = new System.Drawing.Point(0, 97);
             this.BottomPanel.Name = "BottomPanel";
             this.BottomPanel.Size = new System.Drawing.Size(544, 42);
-            this.BottomPanel.TabIndex = 0;
-            // 
-            // Cancel
-            // 
-            this.Cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.Cancel.Location = new System.Drawing.Point(457, 7);
-            this.Cancel.Name = "Cancel";
-            this.Cancel.Size = new System.Drawing.Size(75, 23);
-            this.Cancel.TabIndex = 0;
-            this.Cancel.Text = "Cancel";
-            this.Cancel.UseVisualStyleBackColor = true;
-            this.Cancel.Click += new System.EventHandler(this.Cancel_Click);
+            this.BottomPanel.TabIndex = 3;
             // 
             // Ok
             // 
@@ -71,10 +59,22 @@
             this.Ok.Location = new System.Drawing.Point(376, 7);
             this.Ok.Name = "Ok";
             this.Ok.Size = new System.Drawing.Size(75, 23);
-            this.Ok.TabIndex = 1;
+            this.Ok.TabIndex = 0;
             this.Ok.Text = "OK";
             this.Ok.UseVisualStyleBackColor = true;
             this.Ok.Click += new System.EventHandler(this.Ok_Click);
+            // 
+            // Cancel
+            // 
+            this.Cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.Cancel.Location = new System.Drawing.Point(457, 7);
+            this.Cancel.Name = "Cancel";
+            this.Cancel.Size = new System.Drawing.Size(75, 23);
+            this.Cancel.TabIndex = 1;
+            this.Cancel.Text = "Cancel";
+            this.Cancel.UseVisualStyleBackColor = true;
+            this.Cancel.Click += new System.EventHandler(this.Cancel_Click);
             // 
             // Thumbnail
             // 
@@ -97,7 +97,7 @@
             this.MainInstructionLabel.Location = new System.Drawing.Point(160, 12);
             this.MainInstructionLabel.Name = "MainInstructionLabel";
             this.MainInstructionLabel.Size = new System.Drawing.Size(187, 20);
-            this.MainInstructionLabel.TabIndex = 2;
+            this.MainInstructionLabel.TabIndex = 0;
             this.MainInstructionLabel.Text = "Unknown screenshot found";
             // 
             // DetailLabel
@@ -106,7 +106,7 @@
             this.DetailLabel.Location = new System.Drawing.Point(160, 41);
             this.DetailLabel.Name = "DetailLabel";
             this.DetailLabel.Size = new System.Drawing.Size(327, 13);
-            this.DetailLabel.TabIndex = 3;
+            this.DetailLabel.TabIndex = 1;
             this.DetailLabel.Text = "Please enter the name of the game featured in the screenshot:";
             // 
             // GameNameInput
@@ -116,7 +116,7 @@
             this.GameNameInput.Location = new System.Drawing.Point(164, 57);
             this.GameNameInput.Name = "GameNameInput";
             this.GameNameInput.Size = new System.Drawing.Size(368, 22);
-            this.GameNameInput.TabIndex = 4;
+            this.GameNameInput.TabIndex = 2;
             this.GameNameInput.TextChanged += new System.EventHandler(this.GameNameInput_TextChanged);
             // 
             // UnknownAppIdDialog
