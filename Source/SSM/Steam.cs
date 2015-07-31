@@ -13,8 +13,8 @@ namespace SSM
     {
         private const int WEBCONTENT_MAX_LENGTH = 4096;
 
-        private static Dictionary<ulong, string> appNames;
         private static string appBaseUrl = "http://steamcommunity.com/app/{0}";
+        private static Dictionary<ulong, string> appNames;
 
         /// <summary>
         /// Initializes static fields and properties.
@@ -28,7 +28,10 @@ namespace SSM
         /// Gets the name of a Steam game with the specified ID.
         /// </summary>
         /// <param name="id">The App ID to find a name for.</param>
-        /// <returns>A string containing the display name of the game with the ID, or an empty string.</returns>
+        /// <returns>
+        /// A string containing the display name of the game with the ID, or an
+        /// empty string.
+        /// </returns>
         public static string GetAppName(ulong id)
         {
             if (Steam.appNames.ContainsKey(id))
@@ -61,10 +64,14 @@ namespace SSM
         }
 
         /// <summary>
-        /// Makes a web request to the Steam Community to retrieve a name, and prompts the user in case the request fails.
+        /// Makes a web request to the Steam Community to retrieve a name, and
+        /// prompts the user in case the request fails.
         /// </summary>
         /// <param name="id">The App ID to find a name for.</param>
-        /// <returns>A string containing the display name of the game with the ID, or an empty string.</returns>
+        /// <returns>
+        /// A string containing the display name of the game with the ID, or an
+        /// empty string.
+        /// </returns>
         private static string GetAppNameInternal(ulong id)
         {
             string name = null;
@@ -89,7 +96,9 @@ namespace SSM
         /// <summary>
         /// Parses the specified content for the page title.
         /// </summary>
-        /// <param name="content">A string containing the HTML content of the page to parse.</param>
+        /// <param name="content">
+        /// A string containing the HTML content of the page to parse.
+        /// </param>
         /// <param name="name">The parsed name, or null.</param>
         /// <returns>True if content was parsed successfully.</returns>
         private static bool TryParseAppPage(string content, out string name)

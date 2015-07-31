@@ -8,12 +8,13 @@ namespace SSM
     /// <summary>
     /// Manages Steam's screenshot folder.
     /// </summary>
-    class Manager
+    internal class Manager
     {
         private readonly Regex filePattern = new Regex(@"^(.+?)[\s_-]");
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:SSM.Manager"/> class with the specified base path.
+        /// Initializes a new instance of the <see cref="T:SSM.Manager"/> class
+        /// with the specified base path.
         /// </summary>
         /// <param name="path">The path the screenshots folder.</param>
         public Manager(string path)
@@ -28,17 +29,18 @@ namespace SSM
         public string BasePath { get; private set; }
 
         /// <summary>
-        /// Gets a list of file name prefixes that are to be ignored.
-        /// </summary>
-        public List<string> IgnoredPrefixes { get; private set; }
-
-        /// <summary>
         /// Gets or sets a dictionary that maps names and IDs to folder names.
         /// </summary>
         public NameCache FolderNameCache { get; set; }
 
         /// <summary>
-        /// Moves all uncategorized screenshots into their respective subfolders.
+        /// Gets a list of file name prefixes that are to be ignored.
+        /// </summary>
+        public List<string> IgnoredPrefixes { get; private set; }
+
+        /// <summary>
+        /// Moves all uncategorized screenshots into their respective
+        /// subfolders.
         /// </summary>
         public void Move()
         {
@@ -109,7 +111,7 @@ namespace SSM
                 // If the identifier isn't cached, try Steam
                 if (string.IsNullOrEmpty(name))
                 {
-                    ulong appId; 
+                    ulong appId;
                     if (ulong.TryParse(identifier, out appId))
                         name = Steam.GetAppName(appId);
                 }
@@ -118,7 +120,7 @@ namespace SSM
                 if (string.IsNullOrWhiteSpace(name))
                 {
                     name = PromptName(file, identifier);
-                    if (name == null) 
+                    if (name == null)
                         return string.Empty;
                 }
 
@@ -142,7 +144,9 @@ namespace SSM
         /// <summary>
         /// Prompts the user to specify a name for a file.
         /// </summary>
-        /// <param name="file">The file name without path of a screenshot to show.</param>
+        /// <param name="file">
+        /// The file name without path of a screenshot to show.
+        /// </param>
         /// <param name="identifier">The identifier for the file.</param>
         /// <returns>A name, or null.</returns>
         private string PromptName(string file, string identifier)

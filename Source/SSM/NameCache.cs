@@ -10,14 +10,13 @@ namespace SSM
     /// folder names.
     /// </summary>
     [JsonDictionary]
-    class NameCache : Dictionary<string, string>
+    internal class NameCache : Dictionary<string, string>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NameCache"/> class.
         /// </summary>
         public NameCache()
         {
-
         }
 
         /// <summary>
@@ -32,9 +31,9 @@ namespace SSM
         /// </summary>
         /// <param name="key">The key of the value to get or set.</param>
         /// <returns>
-        /// The value associated with the specified key. If the specified key 
-        /// is not found, a get operation returns <c>null</c>, and a set 
-        /// operation creates a new element with the specified key.
+        /// The value associated with the specified key. If the specified key is
+        /// not found, a get operation returns <c>null</c>, and a set operation
+        /// creates a new element with the specified key.
         /// </returns>
         public new string this[string key]
         {

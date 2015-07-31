@@ -5,7 +5,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace SSM
 {
-    static class Program
+    internal static class Program
     {
         /// <summary>
         /// The path to the AppData directory.
@@ -23,7 +23,7 @@ namespace SSM
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static int Main()
+        private static int Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -32,17 +32,17 @@ namespace SSM
             try
             {
 #endif
-                var configFile = Path.Combine(ConfigDir, "Config.json");
-                var cacheFile = Path.Combine(ConfigDir, "NameCache.json");
+            var configFile = Path.Combine(ConfigDir, "Config.json");
+            var cacheFile = Path.Combine(ConfigDir, "NameCache.json");
 
-                var config = Configuration.FromFile(configFile);
-                CheckSettings(config);
+            var config = Configuration.FromFile(configFile);
+            CheckSettings(config);
 
-                var manager = new Manager(config.BaseDir);
-                manager.FolderNameCache = NameCache.FromFile(cacheFile);
+            var manager = new Manager(config.BaseDir);
+            manager.FolderNameCache = NameCache.FromFile(cacheFile);
 
-                manager.Move();
-                manager.FolderNameCache.Save();
+            manager.Move();
+            manager.FolderNameCache.Save();
 #if !DEBUG
             }
             catch (Exception ex)
@@ -61,9 +61,9 @@ namespace SSM
         }
 
         /// <summary>
-        /// Checks whether the specified configuration is valid and can be 
-        /// used. If the configurationnis invalid, an appropiate exception is 
-        /// thrown. Otherwise, the function simply returns.
+        /// Checks whether the specified configuration is valid and can be used.
+        /// If the configurationnis invalid, an appropiate exception is thrown.
+        /// Otherwise, the function simply returns.
         /// </summary>
         /// <param name="config">
         /// The <see cref="Configuration"/> object to check.
@@ -88,7 +88,8 @@ namespace SSM
         /// <returns>The full path to the folder, or null.</returns>
         private static string FindBaseDir()
         {
-            // TODO: Parse Steam userdata config to find uncompressed screenshots folder
+            // TODO: Parse Steam userdata config to find uncompressed
+            //       screenshots folder
             using (CommonOpenFileDialog dialog = new CommonOpenFileDialog())
             {
                 dialog.IsFolderPicker = true;

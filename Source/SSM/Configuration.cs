@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
-using System.Text;
 using Newtonsoft.Json;
 
 namespace SSM
@@ -10,24 +9,15 @@ namespace SSM
     /// Represents a configuration for the application.
     /// </summary>
     [Serializable]
-    class Configuration
+    internal class Configuration
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Configuration"/> 
-        /// class.
+        /// Initializes a new instance of the <see cref="Configuration"/> class.
         /// </summary>
         public Configuration()
         {
             BaseDir = null;
         }
-
-        /// <summary>
-        /// Gets or sets the full path to the file this configuration 
-        /// represents.
-        /// </summary>
-        [Browsable(false)]
-        [JsonIgnore]
-        public string FileName { get; set; }
 
         /// <summary>
         /// Gets or sets the location of the screenshot folder.
@@ -37,16 +27,12 @@ namespace SSM
         public string BaseDir { get; set; }
 
         /// <summary>
-        /// Saves the configuration to the file it was loaded from.
+        /// Gets or sets the full path to the file this configuration
+        /// represents.
         /// </summary>
-        public void Save()
-        {
-            string dir = Path.GetDirectoryName(this.FileName);
-            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-
-            var json = JsonConvert.SerializeObject(this);
-            File.WriteAllText(FileName, json);
-        }
+        [Browsable(false)]
+        [JsonIgnore]
+        public string FileName { get; set; }
 
         /// <summary>
         /// Creates a <see cref="Configuration"/> from the specified file.
@@ -65,6 +51,18 @@ namespace SSM
 
             config.FileName = path;
             return config;
+        }
+
+        /// <summary>
+        /// Saves the configuration to the file it was loaded from.
+        /// </summary>
+        public void Save()
+        {
+            string dir = Path.GetDirectoryName(this.FileName);
+            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+            var json = JsonConvert.SerializeObject(this);
+            File.WriteAllText(FileName, json);
         }
 
         /// <summary>

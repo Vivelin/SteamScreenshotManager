@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SSM
@@ -17,7 +11,9 @@ namespace SSM
     public partial class UnknownAppIdDialog : Form
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:SSM.UnknownAppIdDialog"/> class with the specified file name.
+        /// Initializes a new instance of the <see
+        /// cref="T:SSM.UnknownAppIdDialog"/> class with the specified file
+        /// name.
         /// </summary>
         /// <param name="path">The file name of the screenshot to show.</param>
         public UnknownAppIdDialog(string path)
@@ -41,25 +37,17 @@ namespace SSM
             set { GameNameInput.Text = value; }
         }
 
-        private void UnknownAppIdDialog_Load(object sender, EventArgs e)
-        {
-            try
-            {
-                Thumbnail.Image = Image.FromFile(FileName);
-            }
-            catch (System.IO.FileNotFoundException ex)
-            {
-                System.Diagnostics.Trace.WriteLine("UnknownAppIdDialog called for invalid file " + ex.FileName);
-                Close();
-            }
-        }
-
-        private void Ok_Click(object sender, EventArgs e)
+        private void Cancel_Click(object sender, EventArgs e)
         {
             Close();
         }
 
-        private void Cancel_Click(object sender, EventArgs e)
+        private void GameNameInput_TextChanged(object sender, EventArgs e)
+        {
+            Ok.Enabled = (GameNameInput.TextLength > 0);
+        }
+
+        private void Ok_Click(object sender, EventArgs e)
         {
             Close();
         }
@@ -74,17 +62,25 @@ namespace SSM
             }
         }
 
-        private void GameNameInput_TextChanged(object sender, EventArgs e)
-        {
-            Ok.Enabled = (GameNameInput.TextLength > 0);
-        }
-
         private void UnknownAppIdDialog_FormClosed(object sender, FormClosedEventArgs e)
         {
             if (Thumbnail != null && Thumbnail.Image != null)
             {
                 Thumbnail.Image.Dispose();
                 Thumbnail.Image = null;
+            }
+        }
+
+        private void UnknownAppIdDialog_Load(object sender, EventArgs e)
+        {
+            try
+            {
+                Thumbnail.Image = Image.FromFile(FileName);
+            }
+            catch (System.IO.FileNotFoundException ex)
+            {
+                System.Diagnostics.Trace.WriteLine("UnknownAppIdDialog called for invalid file " + ex.FileName);
+                Close();
             }
         }
     }
