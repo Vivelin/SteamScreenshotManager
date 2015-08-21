@@ -11,9 +11,8 @@ namespace SSM
     public partial class UnknownAppIdDialog : Form
     {
         /// <summary>
-        /// Initializes a new instance of the <see
-        /// cref="T:SSM.UnknownAppIdDialog"/> class with the specified file
-        /// name.
+        /// Initializes a new instance of the <see cref="UnknownAppIdDialog"/>
+        /// class with the specified file name.
         /// </summary>
         /// <param name="path">The file name of the screenshot to show.</param>
         public UnknownAppIdDialog(string path)

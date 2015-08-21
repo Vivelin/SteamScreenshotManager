@@ -10,7 +10,7 @@ namespace SSM
     /// folder names.
     /// </summary>
     [JsonDictionary]
-    internal class NameCache : Dictionary<string, string>
+    public class NameCache : Dictionary<string, string>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NameCache"/> class.

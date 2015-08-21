@@ -13,8 +13,8 @@ namespace SSM
         private readonly Regex filePattern = new Regex(@"^(.+?)[\s_-]");
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:SSM.Manager"/> class
-        /// with the specified base path.
+        /// Initializes a new instance of the <see cref="Manager"/> class with
+        /// the specified base path.
         /// </summary>
         /// <param name="path">The path the screenshots folder.</param>
         public Manager(string path)

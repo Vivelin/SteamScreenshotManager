@@ -5,7 +5,10 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace SSM
 {
-    internal static class Program
+    /// <summary>
+    /// Represents the main entry point for the application.
+    /// </summary>
+    public static class Program
     {
         /// <summary>
         /// The path to the AppData directory.
@@ -23,15 +26,11 @@ namespace SSM
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        private static int Main()
+        public static int Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-#if !DEBUG
-            try
-            {
-#endif
             var configFile = Path.Combine(ConfigDir, "Config.json");
             var cacheFile = Path.Combine(ConfigDir, "NameCache.json");
 
@@ -43,18 +42,6 @@ namespace SSM
 
             manager.Move();
             manager.FolderNameCache.Save();
-#if !DEBUG
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex);
-                Console.ResetColor();
-                Console.WriteLine(Properties.Resources.PressToContinue);
-                Console.ReadKey(true);
-                return 1;
-            }
-#endif
 
             Console.WriteLine("Cave Johnson, we're done here.");
             return 0;
@@ -62,7 +49,7 @@ namespace SSM
 
         /// <summary>
         /// Checks whether the specified configuration is valid and can be used.
-        /// If the configurationnis invalid, an appropiate exception is thrown.
+        /// If the configuration is invalid, an appropiate exception is thrown.
         /// Otherwise, the function simply returns.
         /// </summary>
         /// <param name="config">

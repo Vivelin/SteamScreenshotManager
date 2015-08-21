@@ -9,7 +9,7 @@ namespace SSM
     /// Represents a configuration for the application.
     /// </summary>
     [Serializable]
-    internal class Configuration
+    public class Configuration
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Configuration"/> class.
