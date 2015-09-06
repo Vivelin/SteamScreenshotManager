@@ -8,43 +8,22 @@ namespace SSM
     /// <summary>
     /// Represents the main entry point for the application.
     /// </summary>
-    public static class Program
+    internal static class Program
     {
-        /// <summary>
-        /// The path to the AppData directory.
-        /// </summary>
-        public static readonly string AppData =
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-
         /// <summary>
         /// The path to the directory that contains the configuration files.
         /// </summary>
-        public static readonly string ConfigDir =
-            Path.Combine(AppData, "SteamScreenshotManager");
+        public static readonly string ConfigDir;
+
+        private static readonly string AppData;
 
         /// <summary>
-        /// The main entry point for the application.
+        /// Initializes the <see cref="Program"/> class.
         /// </summary>
-        [STAThread]
-        public static int Main()
+        static Program()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-
-            var configFile = Path.Combine(ConfigDir, "Config.json");
-            var cacheFile = Path.Combine(ConfigDir, "NameCache.json");
-
-            var config = Configuration.FromFile(configFile);
-            CheckSettings(config);
-
-            var manager = new Manager(config.BaseDir);
-            manager.FolderNameCache = NameCache.FromFile(cacheFile);
-
-            manager.Move();
-            manager.FolderNameCache.Save();
-
-            Console.WriteLine("Cave Johnson, we're done here.");
-            return 0;
+            AppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            ConfigDir = Path.Combine(AppData, "SteamScreenshotManager");
         }
 
         /// <summary>
@@ -88,6 +67,33 @@ namespace SSM
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        private static int Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            var configFile = Path.Combine(ConfigDir, "Config.json");
+            var cacheFile = Path.Combine(ConfigDir, "NameCache.json");
+
+            var config = Configuration.FromFile(configFile);
+            CheckSettings(config);
+
+            var screenshots = new Screenshots(config);
+            screenshots.FolderNameCache = NameCache.FromFile(cacheFile);
+
+            screenshots.Organize();
+            screenshots.FolderNameCache.Save();
+
+            screenshots.Sync();
+
+            Console.WriteLine("Cave Johnson, we're done here.");
+            return 0;
         }
     }
 }

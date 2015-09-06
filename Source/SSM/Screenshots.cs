@@ -6,27 +6,40 @@ using System.Text.RegularExpressions;
 namespace SSM
 {
     /// <summary>
-    /// Manages Steam's screenshot folder.
+    /// Represents Steam's screenshot folder.
     /// </summary>
-    internal class Manager
+    public class Screenshots
     {
         private readonly Regex filePattern = new Regex(@"^(.+?)[\s_-]");
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Manager"/> class with
-        /// the specified base path.
+        /// Initializes a new instance of the <see cref="Screenshots"/> class
+        /// using the specified configuration.
         /// </summary>
+        /// <param name="config">
+        /// A <see cref="Configuration"/> object with the settings to use.
+        /// </param>
+        public Screenshots(Configuration config) : this(config, config.BaseDir)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Screenshots"/> class
+        /// using the specified configuration and the base path.
+        /// </summary>
+        /// <param name="config">
+        /// A <see cref="Configuration"/> object with the settings to use.
+        /// </param>
         /// <param name="path">The path the screenshots folder.</param>
-        public Manager(string path)
+        public Screenshots(Configuration config, string path)
         {
+            Config = config;
             BasePath = path;
-            IgnoredPrefixes = new List<string>();
         }
 
         /// <summary>
-        /// The path to the screenshots folder.
+        /// Gets the path to the screenshots folder.
         /// </summary>
-        public string BasePath { get; private set; }
+        public string BasePath { get; }
 
         /// <summary>
         /// Gets or sets a dictionary that maps names and IDs to folder names.
@@ -36,19 +49,26 @@ namespace SSM
         /// <summary>
         /// Gets a list of file name prefixes that are to be ignored.
         /// </summary>
-        public List<string> IgnoredPrefixes { get; private set; }
+        public List<string> IgnoredPrefixes { get; } = new List<string>();
+
+        /// <summary>
+        /// Gets a <see cref="Configuration"/> object containing the settings to
+        /// use.
+        /// </summary>
+        protected Configuration Config { get; }
 
         /// <summary>
         /// Moves all uncategorized screenshots into their respective
         /// subfolders.
         /// </summary>
-        public void Move()
+        public void Organize()
         {
-            foreach (string path in Directory.EnumerateFiles(this.BasePath, "*.png", SearchOption.TopDirectoryOnly))
+            foreach (string path in Directory.EnumerateFiles(this.BasePath, "*.*", SearchOption.TopDirectoryOnly))
             {
                 string fileName = Path.GetFileName(path);
                 string name = GetNameFromFile(fileName);
-                if (ShouldSkip(name))
+                if (ShouldSkip(name)
+                    || !Regex.IsMatch(path, Config.Filter, RegexOptions.IgnoreCase))
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine(Properties.Resources.SkippedFile, fileName);
@@ -78,21 +98,12 @@ namespace SSM
         }
 
         /// <summary>
-        /// Returns whether a file should be skipped or not.
+        /// Sync local screenshots with the remote server.
         /// </summary>
-        /// <param name="file">The name of the file (without path).</param>
-        /// <returns>True if the file should be skipped.</returns>
-        public bool ShouldSkip(string file)
+        public void Sync()
         {
-            if (string.IsNullOrEmpty(file)) return true;
-
-            foreach (var item in IgnoredPrefixes)
-            {
-                if (file.StartsWith(item.ToString()))
-                    return true;
-            }
-
-            return false;
+            var remote = new Remote(Config);
+            remote.Upload(BasePath, Config.RemoteBaseDir);
         }
 
         /// <summary>
@@ -126,7 +137,7 @@ namespace SSM
 
                 foreach (char invalid in Path.GetInvalidFileNameChars())
                     name = name.Replace(invalid.ToString(), "");
-                foreach (char invalid in new char[] { '™' })
+                foreach (char invalid in new char[] { '™', '®', '©' })
                     name = name.Replace(invalid.ToString(), "");
 
                 if (!string.IsNullOrWhiteSpace(name)
@@ -167,6 +178,24 @@ namespace SSM
             }
 
             return name;
+        }
+
+        /// <summary>
+        /// Returns whether a file should be skipped or not.
+        /// </summary>
+        /// <param name="file">The name of the file (without path).</param>
+        /// <returns>True if the file should be skipped.</returns>
+        private bool ShouldSkip(string file)
+        {
+            if (string.IsNullOrEmpty(file)) return true;
+
+            foreach (var item in IgnoredPrefixes)
+            {
+                if (file.StartsWith(item.ToString()))
+                    return true;
+            }
+
+            return false;
         }
     }
 }
